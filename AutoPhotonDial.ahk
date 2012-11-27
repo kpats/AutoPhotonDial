@@ -1,12 +1,12 @@
 #NoEnv
-#include StdoutToVar.ahk
 
-SendMode Input
 SetWorkingDir %A_ScriptDir%
+#include StdoutToVar.ahk
 
 connection = TATA HSIA
 userName = internet
 password = internet
+
 
 If ConnectedToInternet() 
 {
@@ -15,10 +15,12 @@ If ConnectedToInternet()
 }
 else 
 {
-	Drive, Eject,%1%
-	if ( ErrorLevel = 0 )
-		sleep 3000
-
+	if ( GetDriveByLabel("Photon+") )
+	{
+		Drive, Eject,% GetDriveByLabel("Photon+") 
+		if ( ErrorLevel = 0 )
+			sleep 3000
+	}
 	DUN := StdoutToVar_CreateProcess("RasDial """ . connection . """ " . username . " " . password)
 	Loop, Parse, DUN, `n, `r
 	{
@@ -38,4 +40,15 @@ else
 ConnectedToInternet(flag=0x40)
 { 
 	Return DllCall("Wininet.dll\InternetGetConnectedState", "Str", flag,"Int",0) 
+}
+
+GetDriveByLabel(p_Label)
+{
+  DriveGet, l_Temp, List
+  Loop, Parse, l_Temp
+  {
+	DriveGet, l_Temp, Label, %A_LoopField%:
+	If ( l_Temp = p_Label )
+	  Return A_LoopField
+  }
 }
